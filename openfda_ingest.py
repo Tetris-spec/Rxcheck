@@ -588,12 +588,18 @@ def extract_drug_info(label):
     if not label:
         return None
 
-    def get_field(field_name):
-        """Helper to get a field as joined string."""
+    def get_field(field_name, max_len=1500):
+        """Helper to get a field as joined string, truncated to max_len."""
         val = label.get(field_name, [])
         if isinstance(val, list):
-            return " ".join(val) if val else ""
-        return str(val) if val else ""
+            s = " ".join(val) if val else ""
+        else:
+            s = str(val) if val else ""
+        # Collapse whitespace and truncate
+        s = " ".join(s.split())
+        if len(s) > max_len:
+            s = s[:max_len].rsplit(" ", 1)[0] + "..."
+        return s
 
     # openfda subfield has structured class info
     openfda = label.get("openfda", {})
